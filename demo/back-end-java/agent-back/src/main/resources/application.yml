@@ -1,0 +1,28 @@
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 1
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123456
+    url: jdbc:mysql://localhost:3306/agent-database
+  mail:
+    host: smtp.qq.com            # QQ??SMTP?????
+    port: 465                    # SSL??
+    username: 3887768494@qq.com  # ??QQ????
+    password: vvhofhzyeriwccga   # ????????QQ???
+    protocol: smtps              # ??SMTP over SSL
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: false         # ??SSL
+            required: false
+        #          starttls:
+        #            enable: true         # ??STARTTLS
+        #            required: true
+        debug: false              # ???????????????# ???????????????

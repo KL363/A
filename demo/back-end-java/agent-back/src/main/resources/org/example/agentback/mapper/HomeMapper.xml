@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.agentback.mapper.HomeMapper">
+    <insert id="InsertHistory">
+        insert into userhistory (id, userId, role, historyId, content, askTime, avatar)
+            VALUES (#{id},#{userId},#{role},#{historyId},#{content},#{askTime},#{avatar})
+    </insert>
+    <select id="SelectById" resultType="integer">
+        select historyId from userhistory where userId = #{userId} order by historyId desc;
+    </select>
+    <select id="SelectByUserId" resultType="org.example.agentback.pojo.UserHistory">
+        select historyId, content, askTime from userhistory where userId = #{userId} order by historyId desc
+    </select>
+    <delete id="DeleteById">
+        delete from userhistory where
+            historyId = #{historyId} and userId = #{userId}
+    </delete>
+    <select id="selectByUserIdAndHistoryId" resultType="org.example.agentback.pojo.UserHistory">
+        select role, content, historyId ,avatar from userhistory where historyId = #{historyId} and userId = #{userId}
+    </select>
+</mapper>

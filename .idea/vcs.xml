@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/demo/back-end-python/chunkit_fronted" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/demo/back-end-python/chunkit_fronted/Qwen3-Embedding-0.6B" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/demo/back-end-python/chunkit_fronted/cross-encoder-model" vcs="Git" />
+  </component>
+</project>

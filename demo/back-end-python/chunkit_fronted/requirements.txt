@@ -1,0 +1,58 @@
+# ===== 核心Web框架 =====
+fastapi>=0.104.0
+uvicorn>=0.24.0
+pydantic>=2.0.0
+
+# ===== 向量数据库和嵌入模型 =====
+faiss-cpu>=1.11.0              # FAISS向量库（主要使用）
+chromadb>=0.4.0                # 用于debug.py
+sentence-transformers>=3.0.0   # 句子嵌入模型
+
+# ===== 大语言模型API =====
+dashscope>=1.20.0              # 百炼大模型服务
+
+# ===== 文本处理和分割 =====
+langchain-text-splitters>=0.2.0
+tiktoken>=0.5.0
+
+# ===== 文档处理 =====
+PyPDF2>=3.0.0                  
+python-docx>=1.1.0             
+
+# ===== 机器学习框架 =====
+torch>=2.0.0
+transformers>=4.35.0
+numpy>=1.24.0
+scikit-learn>=1.7.0            
+joblib>=1.5.0                 
+
+# ===== 图像处理 =====
+Pillow>=11.3.0                 
+
+# ===== HTTP请求和API客户端 =====
+requests>=2.32.0               
+sseclient-py                   
+
+# ===== 环境配置 =====
+python-dotenv                 
+
+# ===== OpenAI API（图像描述生成） =====
+openai                         
+
+# ===== 数据处理和工具 =====
+tqdm>=4.65.0                 
+
+# ===== Web应用框架（测试和调试） =====
+streamlit>=1.28.0              # 用于test.py和debug.py
+
+# ===== 可选依赖（高级功能） =====
+# 如需启用以下功能，请取消注释：
+# mteb>=1.0.0                  # 多语言文本嵌入基准测试
+# datasets>=2.14.0             # 数据集处理
+# ir-datasets>=0.5.0           # 信息检索数据集
+# pytorch-lightning>=2.0.0     # 深度学习框架
+
+# ===== 开发和调试工具（可选） =====
+# jupyter>=1.0.0               # Jupyter笔记本
+# matplotlib>=3.5.0            # 数据可视化
+# seaborn>=0.11.0              # 统计数据可视化
