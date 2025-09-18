@@ -141,6 +141,7 @@ class InteractiveAgent:
     def _get_batch_answers_for_intents(self, enhancement_result: dict) -> list:
         """【内部执行器 - 非流式】接收分析结果，返回一个包含所有回答的列表。"""
         all_responses = []
+        original_query = enhancement_result.get("original_query")
         for item in enhancement_result["analysis_results"]:
             if "error" in item: continue
 
@@ -151,7 +152,7 @@ class InteractiveAgent:
             try:
                 # 根据意图选择Agent并调用
                 if Rag_intent == "校园知识问答助手":
-                    string_generator = self.llm.retrieve_and_answer(rewritten_query, top_k=5)
+                    string_generator = self.llm.retrieve_and_answer(original_query, top_k=5)
                     answer = "".join(string_generator)
                 else:
                     rag_agent = self.get_rag_agent(Rag_intent)
@@ -170,6 +171,11 @@ class InteractiveAgent:
     def _stream_answers_for_intents(self, enhancement_result: dict):
             """【内部执行器 - 流式】接收分析结果，返回一个依次处理所有意图的生成器。"""
             try:
+                original_query = enhancement_result.get("original_query")
+                if not original_query:
+                    yield from self._stream_error("未能获取到原始用户问题。")
+                    return
+
                 for item in enhancement_result["analysis_results"]:
                     if "error" in item:
                         # 对于错误情况，保持原有格式或简化
@@ -185,11 +191,11 @@ class InteractiveAgent:
 
                     try:
                         if Rag_intent == "校园知识问答助手":
-                            paragraph_generator = self.llm.retrieve_and_answer(rewritten_query, top_k=8)
+                            paragraph_generator = self.llm.retrieve_and_answer(original_query, top_k=8)
                         else:
                             rag_agent = self.get_rag_agent(Rag_intent)
                             if rag_agent:
-                                paragraph_generator = rag_agent.call_RAG_stream(rewritten_query)
+                                paragraph_generator = rag_agent.call_RAG_stream(original_query)
                             else:
                                 # 如果智能体不存在，则生成一个包含错误信息的段落
                                 paragraph_generator = iter(["抱歉，暂不支持此意图。"])
