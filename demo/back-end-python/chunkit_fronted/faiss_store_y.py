@@ -112,7 +112,7 @@ class FAISSVectorStore:
         if self.index.ntotal == 0:
             return []
         
-        # 转换查询向量
+        # 转换查询向量，把列表变成 NumPy 数组，并包装成二维数组形状
         query_vector = np.array([query_embedding], dtype=np.float32)
         
         # 搜索

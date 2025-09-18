@@ -89,7 +89,6 @@ class RagQueryEnhancer:
         """
         【核心公共方法】
         执行完整的RAG流程：识别意图并生成一个或多个强化后的查询。
-        这完美地解决了您的问题：它不需要外部传入 vector_store！
         """
         # --- 1. 检索 ---
         # 直接使用 self.vector_store，它在初始化时就已经准备好了！

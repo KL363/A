@@ -151,7 +151,7 @@ class InteractiveAgent:
             try:
                 # 根据意图选择Agent并调用
                 if Rag_intent == "校园知识问答助手":
-                    string_generator = self.llm.retrieve_and_answer(rewritten_query, top_k=8)
+                    string_generator = self.llm.retrieve_and_answer(rewritten_query, top_k=5)
                     answer = "".join(string_generator)
                 else:
                     rag_agent = self.get_rag_agent(Rag_intent)
@@ -165,44 +165,62 @@ class InteractiveAgent:
                 all_responses.append({"success": False, "intent": Rag_intent, "avatar": avatar, "error": str(e)})
         return all_responses
 
+        # 在 InteractiveAgent 类中找到这个方法并替换它
+
     def _stream_answers_for_intents(self, enhancement_result: dict):
-        """【内部执行器 - 流式】接收分析结果，返回一个依次处理所有意图的生成器。"""
-        try:
-            for item in enhancement_result["analysis_results"]:
-                if "error" in item:
-                    yield {"type": "error", "intent": item.get("intent"), "message": item["error"]}
-                    continue
+            """【内部执行器 - 流式】接收分析结果，返回一个依次处理所有意图的生成器。"""
+            try:
+                for item in enhancement_result["analysis_results"]:
+                    if "error" in item:
+                        # 对于错误情况，保持原有格式或简化
+                        yield {"type": "error", "intent": item.get("intent"), "message": item["error"]}
+                        continue
 
-                Rag_intent = item["intent"]
-                rewritten_query = item["rewritten_query"]
-                avatar = self.intent_avatar_mapping.get(Rag_intent, self.intent_avatar_mapping["其他"])
+                    Rag_intent = item["intent"]
+                    rewritten_query = item["rewritten_query"]
+                    avatar = self.intent_avatar_mapping.get(Rag_intent, self.intent_avatar_mapping["其他"])
 
-                # a. 先发送意图和头像信息
-                yield {"type": "intent", "intent": Rag_intent, "avatar": avatar}
+                    # 定义一个生成器变量，用来接收来自不同智能体的段落流
+                    paragraph_generator = None
 
-                # b. 再流式传输内容
-                try:
-                    if Rag_intent == "校园知识问答助手":
-                        generator = self.llm.retrieve_and_answer(rewritten_query, top_k=8)
-                        for text_chunk in generator:
-                            yield {"type": "content", "delta": text_chunk}
-                    else:
-                        rag_agent = self.get_rag_agent(Rag_intent)
-                        if rag_agent:
-                            for delta in rag_agent.call_RAG_stream(rewritten_query):
-                                yield {"type": "content", "delta": delta}
+                    try:
+                        if Rag_intent == "校园知识问答助手":
+                            paragraph_generator = self.llm.retrieve_and_answer(rewritten_query, top_k=8)
                         else:
-                            yield {"type": "content", "delta": "抱歉，暂不支持此意图。"}
-                except Exception as e:
-                    yield {"type": "content", "delta": f"处理时发生错误: {str(e)}"}
+                            rag_agent = self.get_rag_agent(Rag_intent)
+                            if rag_agent:
+                                paragraph_generator = rag_agent.call_RAG_stream(rewritten_query)
+                            else:
+                                # 如果智能体不存在，则生成一个包含错误信息的段落
+                                paragraph_generator = iter(["抱歉，暂不支持此意图。"])
 
-                # c. 每个意图结束后发送一个分隔符
-                yield {"type": "break", "message": f"意图 {Rag_intent} 回答结束"}
+                        # 统一处理所有段落流
+                        for paragraph in paragraph_generator:
+                            # 为每一段话都创建一个包含所有信息的、完整的消息包
+                            yield {
+                                "type": "content",
+                                "intent": Rag_intent,
+                                "avatar": avatar,
+                                "delta": paragraph  # paragraph 就是我们的一整段话
+                            }
 
-            # d. 所有意图都结束后发送最终完成标志
-            yield {"type": "finished", "finished": True}
-        except Exception as e:
-            yield from self._stream_error(f"流式处理时发生严重错误: {str(e)}")
+                    except Exception as e:
+                        # 如果在生成过程中出错，也发送一个结构完整的错误消息
+                        yield {
+                            "type": "error",
+                            "intent": Rag_intent,
+                            "avatar": avatar,
+                            "message": f"处理时发生错误: {str(e)}"
+                        }
+                    # --- 修改结束 ---
+
+                    # 每个意图结束后发送一个分隔符
+                    yield {"type": "break", "message": f"意图 {Rag_intent} 回答结束"}
+
+                # 所有意图都结束后发送最终完成标志
+                yield {"type": "finished", "finished": True}
+            except Exception as e:
+                yield from self._stream_error(f"流式处理时发生严重错误: {str(e)}")
 
     def _stream_error(self, message: str):
         """【辅助函数】用于在流式模式下返回一个标准的错误信息。"""
@@ -213,9 +231,9 @@ class InteractiveAgent:
         print("=== 欢迎使用智能助手系统 ===")
         print("本系统使用本地RAG检索增强 + 远程智能体架构")
         print("支持交叉编码器精确检索和流式回答")
-        print("输入你的问题（输入 'exit' 退出，'stream' 切换流式模式）：\n")
+        print("输入你的问题（输入 'exit' 退出，'batch' 切换非流式模式）：\n")
 
-        stream_mode = False
+        stream_mode = True
 
         while True:
             user_input = input("你：")
@@ -224,9 +242,9 @@ class InteractiveAgent:
                 print("再见！")
                 break
 
-            if user_input.lower() == "stream":
+            if user_input.lower() == "batch":
                 stream_mode = not stream_mode
-                print(f"流式模式: {'开启' if stream_mode else '关闭'}")
+                print(f"模式已切换。当前流式输出: {'开启' if stream_mode else '关闭'}")
                 continue
 
             results = self.process_question_with_full_response(user_input, stream_mode=stream_mode)
@@ -234,25 +252,22 @@ class InteractiveAgent:
             if stream_mode:
                 # 处理流式生成器
                 current_intent = "未知意图"
-                print("--- 流式回答 ---")
+                print("--- 流式回答 (一段一段) ---")
                 try:
                     for chunk in results:
-                        if chunk.get('type') == 'intent':
-                            current_intent = chunk.get('intent', current_intent)
-                            print(f"🤖 {current_intent}: ", end="", flush=True)
-
-                        elif chunk.get('type') == 'content':
-                            print(chunk.get('delta', ''), end="", flush=True)
+                        # 直接处理 content 类型的包，因为它包含了所有信息
+                        if chunk.get('type') == 'content':
+                            avatar = chunk.get('avatar', '🤖')
+                            paragraph = chunk.get('delta', '')
+                            # 模拟前端渲染：每一段都带上自己的头像信息
+                            print(f"头像: {avatar} | 回答段落: {paragraph}")
 
                         elif chunk.get('type') == 'break':
-                            print("\n")  # 意图回答结束后换行
+                            print("--- (一个意图回答结束) ---\n")
 
                         elif chunk.get('type') == 'error':
-                            print(f"\n处理时发生错误: {chunk.get('message')}")
+                            print(f"处理时发生错误: {chunk.get('message')}")
 
-                        elif chunk.get('type') == 'finished' and chunk.get('finished'):
-                            # 可以在这里加一个最终结束的提示，如果需要的话
-                            pass
                 except Exception as e:
                     print(f"\n处理流式响应时发生错误: {e}")
                 print("\n------------------\n")
