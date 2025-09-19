@@ -7,7 +7,6 @@ from multiRAG import MultiRAG
 APP_ID = "c2affdebf6664d438a4043216ee15dea"
 apiKey = "sk-93817db303964020bbc79b017be4768b"
 
-
 class LLM_model:
     def __init__(self):
         """

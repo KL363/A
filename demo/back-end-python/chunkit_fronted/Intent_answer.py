@@ -157,7 +157,7 @@ class InteractiveAgent:
                 else:
                     rag_agent = self.get_rag_agent(Rag_intent)
                     if rag_agent:
-                        answer = rag_agent.call_RAG(rewritten_query)
+                        answer = rag_agent.call_RAG(original_query)
                     else:
                         answer = "抱歉，暂不支持此意图。"
 
