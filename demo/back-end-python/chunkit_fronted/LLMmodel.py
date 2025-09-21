@@ -82,6 +82,8 @@ class LLM_model:
                 stream=False  # 改为False，获取完整响应
             )
             if response.status_code == HTTPStatus.OK:
+                request_id = response.request_id
+                print(f"成功获取到回答，Request ID: {request_id}")  # 你可以在这里打印或记录它
                 full_response_text = response.output.text
             else:
                 error_message = f'API Error: {response.code} {response.message}'

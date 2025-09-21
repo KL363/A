@@ -8,6 +8,7 @@ from retrieve_model import retrieve_relevant_chunks
 from sentence_transformers import SentenceTransformer
 from sentence_transformers import CrossEncoder
 import torch
+import os
 
 collection_name = "document_embeddings"
 local_model_path = "./cross-encoder-model"
@@ -97,31 +98,35 @@ class RAG():
 #心理助手
 class RAG_psychology(RAG):
     def __init__(self):
+        psychology_id= os.getenv("APP_ID_PSYCHOLOGY")
         self.index_path = "./faiss_index/psychology"  # ✅ 正确路径
         self.collection = "psychology_docs"           # ✅ 正确集合名
-        self.llm = LLM_psychology()
+        self.llm = LLM_psychology(app_id=psychology_id)
         super().__init__()
 
 #健身饮食助手
 class RAG_fitness(RAG):
     def __init__(self):
+        fitness_id= os.getenv("APP_ID_FITNESS")
         self.index_path = "./faiss_index/fitness"     # ✅ 正确路径
         self.collection = "fitness_docs"              # ✅ 正确集合名
-        self.llm = LLM_fitness()
+        self.llm = LLM_fitness(app_id=fitness_id)
         super().__init__()
 
 #校园知识问答
 class RAG_compus(RAG):
     def __init__(self):
+        compus_id= os.getenv("APP_ID_COMPUS")
         self.index_path = "./faiss_index/campus"      # ✅ 正确路径
         self.collection = "campus_docs"               # ✅ 正确集合名
-        self.llm = LLM_compus()
+        self.llm = LLM_compus(app_id=compus_id)
         super().__init__()
 
 #论文助手
 class RAG_paper(RAG):
     def __init__(self):
+        paper_id= os.getenv("APP_ID_PAPER")
         self.index_path = "./faiss_index/paper"       # ✅ 正确路径
         self.collection = "paper_docs"                # ✅ 正确集合名
-        self.llm = LLM_paper()
+        self.llm = LLM_paper(app_id=paper_id)
         super().__init__()
