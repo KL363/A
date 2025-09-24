@@ -1,6 +1,9 @@
 import streamlit as st
 from Agent_test import InteractiveAgent
 
+#Streamlit run Streamlit_test.py可以运行此功能
+
+
 # 设置页面标题和图标
 st.set_page_config(page_title="多智能体系统测试", page_icon="🧪")
 
