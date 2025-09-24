@@ -152,7 +152,7 @@ class InteractiveAgent:
             try:
                 # 根据意图选择Agent并调用
                 if Rag_intent == "校园知识问答助手":
-                    string_generator = self.llm.retrieve_and_answer(original_query, top_k=5)
+                    string_generator = self.llm.retrieve_and_answer(original_query, top_k=8)
                     answer = "".join(string_generator)
                 else:
                     rag_agent = self.get_rag_agent(Rag_intent)
